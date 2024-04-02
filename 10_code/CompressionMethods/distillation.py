@@ -5,15 +5,6 @@ import torch.nn.functional as F
 from .utils import utils
 import time
 
-"""class KnowledgeDistillationTrainingArguments(TrainingArguments):
-    def __init__(self, *args, alpha=0.5, temperature=2.0, **kwargs):
-        #*args allows us to pass a variable number of non-keyword arguments to a Python function.
-        #**kwargs stands for keyword arguments. The only difference from args is that it uses keywords and returns the values in the form of a dictionary.
-        super().__init__(*args, **kwargs)
-        #The super() function is often used with the __init__() method to initialize the attributes of the parent class.
-        self.alpha = alpha
-        self.temperature = temperature"""
-
 class KnowledgeDistillationTrainer(Trainer):
   def __init__(self, *args, teacher_model=None, temperature = 2.0, alpha = 0.5, **kwargs):
     super().__init__(*args, **kwargs)
