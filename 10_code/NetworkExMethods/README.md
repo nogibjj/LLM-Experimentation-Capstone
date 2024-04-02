@@ -48,11 +48,11 @@ pip install onnxruntime-gpu --extra-index-url https://aiinfra.pkgs.visualstudio.
 ## Convert Model
 The model to convert can from Local, Global Environment, or Huggingface
 
-Hugging face Example
+**Hugging face Example**
 
 ```sh
 converter = ONNXconverter( model_load_method = "huggingface",model_checkpoint = "elisachen/gptq-tinyllama-classification", device="cuda",op_version = 14, architecture="transformer")
-results = model_to_onnx_and_evaluate(
+results = converter.onnx_convert_classification(
                             tokenizer_load_method = "huggingface",
                             sample_input = x[0],
                             tokenizer_checkpoint = "elisachen/gptq-tinyllama-classification",
