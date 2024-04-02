@@ -43,6 +43,27 @@ Virtual Machines and Cloud Platforms (CUDA Version 12.X): For platforms commonly
 pip install onnxruntime-gpu --extra-index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/
 ```
 
+# How to Use
+
+## Convert Model
+The model to convert can from Local, Global Environment, or Huggingface
+
+Hugging face Example
+
+```sh
+converter = ONNXconverter( model_load_method = "huggingface",model_checkpoint = "elisachen/gptq-tinyllama-classification", device="cuda",op_version = 14, architecture="transformer")
+results = model_to_onnx_and_evaluate(
+                            tokenizer_load_method = "huggingface",
+                            sample_input = x[0],
+                            tokenizer_checkpoint = "elisachen/gptq-tinyllama-classification",
+                            onnx_path = "model.onnx",
+                            x=x,
+                            y=y_true
+                            )
+print("Evaluation Results:", results)
+```
+
+
 ## Additional Resources
 
 For more detailed information about ONNX Runtime and its compatibility with CUDA, please visit the [ONNX Runtime documentation](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html).
