@@ -12,6 +12,20 @@ Based on our experiment findings, five models, including three with transformer 
 
 To leverage GPU acceleration with ONNX Runtime, ensure you install the correct version of ONNX Runtime that corresponds with your CUDA version. Using the wrong versions may result in the ONNX model defaulting to CPU execution, even if you specify the GPU (`cuda`) as the target device.
 
+Install as:
+
+```sh
+!pip install onnx optimum onnxruntime
+```
+
+Import as:
+```sh
+import onnx
+import onnxruntime as ort
+from optimum.onnxruntime import ORTModelForSequenceClassification
+```
+
+
 ## Installation Instructions
 
 **For GPU Usage:** Replace `onnxruntime` with `onnxruntime-gpu` for GPU support. Install via pip using:
