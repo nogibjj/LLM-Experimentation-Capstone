@@ -8,7 +8,7 @@ ONNX (Open Neural Network Exchange) enables seamless model deployment across div
 
 Based on our experiment findings, five models, including three with transformer architectures and two BERT models, achieved an average inference speed optimization of 2X.
 
-# ONNX Runtime GPU Support
+# ONNX Runtime & Hardware Support
 
 To leverage GPU acceleration with ONNX Runtime, ensure you install the correct version of ONNX Runtime that corresponds with your CUDA version. Using the wrong versions may result in the ONNX model defaulting to CPU execution, even if you specify the GPU (`cuda`) as the target device.
 
