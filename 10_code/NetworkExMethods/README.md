@@ -18,6 +18,7 @@ To leverage GPU acceleration with ONNX Runtime, ensure you install the correct v
 
 ```sh
 pip install onnxruntime-gpu
+```
 
 **CUDA Version Compatibility**
 Personal Machines (Common CUDA Version 11.X): The standard onnxruntime-gpu package supports CUDA 11.X, which is widely used on personal devices. It can be installed directly using pip as shown above.
