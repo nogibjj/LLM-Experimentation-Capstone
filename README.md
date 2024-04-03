@@ -100,11 +100,26 @@ Largest gains in the inference speed are seemingly introduced through pruning an
 ![alt text](./20_intermediate_files/images/image-bert-results-2.png)
 
 ### 4.2 TinyLlama Model
+![alt text](image.png)
+As observed with BERT model, the 4-bit static quantization proves to be an effective method in reducing the size of the LLM achieving a **>75%** reduction in model size. The accuracy of the model fluctuates significantly more for the LLM compared to that of BERT. GPTQ and the static quantization methods generally result in an accuracy improvement (likely due to regularization effect as well) while the AWQ method results in an accuracy loss of >2% and in a considerable accuracy loss of >10% when combined with other methods. Furthermore, while the combination of pruning and the state-of-the-art quantization methods (AWQ & GPTQ) result in faster inference speeds, they also introduce compounded information loss that has not currently been optimized for as demonstrated by the <5% accuracy. 
 
+There were 4 experiments in total that were effective in increasing the inference speed. Pruning reduces the model latency by **2x** independently and by **1.18x** when combined with 4-bit quantization. In the case of TinyLlama, quantization is merely used to improve the size and (potentially) the accuracy of the model. The inference speed gains are observed once combined with other techniques such as pruning. The combination of pruning and 4-bit quantization is a manifestation of all the combined advantages of each method. 
 
+![alt text](image-2.png)
 
 ## 5. Conclusion
+In this project, we experimented with three different compression methods and one network exchange method to compress and acclerate large language models. From our results, we observed that the best results are achieved when methods are used in combination with one another to obtain synergistic advantages on both latency and model size. Static quantization (4-bit) and GPTQ seem to be effective methods in reducing the size of models by **>75%** and improving the accuracy of models through regularization effect. These methods are best combined with pruning and distillation to yield an inference speed gain of **~1.2x - 6x** depending on the model. 
 
-## 6. Usage Instructions
+## 6. Usage Instructions - @adityaemmanuel, @zhanyil2
+Please use the following command to install all the required packages to run our scripts:
+```
+pip install -r requirements.txt
+```
+Additionally, follow the below instructions to run the scripts to perform
+...
 
 ## 7. Contributors
+[Aditya John](https://www.linkedin.com/in/aditya-john/)<br>
+[Elisa Chen](https://www.linkedin.com/in/elisachenfin/)<br>
+[Jenny (Yiran) Shen]()<br>
+[Zhanyi Lin](https://www.linkedin.com/in/zhanyi-lin-b48011206/?trk=public_profile_samename-profile&originalSubdomain=hk)
