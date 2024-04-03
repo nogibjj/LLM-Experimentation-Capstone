@@ -5,8 +5,115 @@ import pandas as pd
 from torch import cuda
 from sklearn.metrics import f1_score, roc_auc_score, accuracy_score
 import torch
-import optimum
+from datasets import load_dataset
 
+def load_data_hf(dataset_id = None, dataset_subid = None):
+    """
+    Helper function to load data.
+    Params:
+        dataset_id (str): the dataset stored from HuggingFace. If this is none, you can specify your custom dataset in the tokenizer class.
+        dataset_subid (str): the specific sub dataset within the corpus of data in huggingface
+    Returns:
+        dataset (tensor): dataset loaded from HuggingFace
+    """
+    if not dataset_subid:
+        dataset = load_dataset(dataset_id)
+    else:
+        dataset = load_dataset(dataset_id, dataset_subid)
+    return dataset
+
+def get_model_size(model):
+    """
+    Function to calculate the size of the LLM in MB 
+    Params:
+        model (transformers.model): The model being evaluated
+        dataset_subid (str): the specific sub dataset within the corpus of data in huggingface
+    Returns:
+        dataset (tensor): dataset loaded from HuggingFace
+    """
+
+    param_size = 0
+    for param in model.parameters():
+        param_size += param.nelement() * param.element_size()
+    buffer_size = 0
+    for buffer in model.buffers():
+        buffer_size += buffer.nelement() * buffer.element_size()
+
+    model_size = (param_size + buffer_size) / 1024**2
+    print('Model size: {:.3f}MB'.format(model_size))
+
+    return model_size
+
+def multi_label_metrics_eval(predictions, labels, threshold=0.5):
+        """Helper function to perform inferences using the model."""
+        y_pred = []
+        for inner_list in predictions:
+            new_inner_list = [1 if value > threshold else 0 for value in list(inner_list)]
+            y_pred.append(new_inner_list)
+
+        # finally, compute metrics
+        accuracy = accuracy_score(labels, y_pred)
+        # return as dictionary
+        return accuracy
+
+def evaluate_heegyu_augsec(model, tokenizer, dataset, device="cuda", num_samples=1000):
+    label_map = {"Question":0, "Restatement or Paraphrasing":1, "Reflection of feelings":2, "Self-disclosure":3, "Affirmation and Reassurance":4,
+        "Providing Suggestions":5, "Information":6, "Others":7}
+
+    x = []
+    y_true = []
+    for sample in dataset['test']:
+        for row in sample['dialog']:
+            text = row['text']
+            label = row['strategy']
+            if label != None:
+                x.append(text)
+                y_true.append(label_map[label])
+
+    input = x[0:num_samples]
+    labels = y_true[0:num_samples]
+
+
+    y_pred = []
+    times = []
+    for current_x in input:
+        inputs = tokenizer(current_x, return_tensors="pt").to("cuda")
+        start_time = time.time()
+        logits = model(**inputs).logits.softmax(-1)
+        end_time = time.time()
+        label = logits.argmax(-1).item()
+        y_pred.append(label)
+        times.append(end_time - start_time)
+    accuracy = accuracy_score(labels, y_pred)
+    # print(pd.Series(times).describe().T)
+    mean_time = sum(times)/len(times)
+    return {"mean_time":mean_time, "accuracy":accuracy}
+
+def evaluate_sem_eval_2018_task_1_dataset(model, tokenizer, dataset, device="cuda"):
+    """Helper function to evaluate the inference time and performance of finetuned model."""
+    def convert_dict_to_labels(dictionary):
+        return [int(dictionary[key]) for key in dictionary if key not in ['ID', 'Tweet']]
+
+    input = [x['Tweet'] for x in dataset['validation']]
+    # Iterate through the list of dictionaries and convert each one
+    labels = [convert_dict_to_labels(data_dict) for data_dict in dataset['validation']]
+
+    predictions = []
+    times = []
+
+    for input_ in input:
+        inputs = tokenizer(input_, return_tensors = "pt", padding="max_length", truncation=True, max_length=128).to(device)
+        st = time.time()
+        with torch.no_grad():
+            output = model(**inputs).logits
+            times.append(time.time() - st)
+            predictions.append(output.squeeze())
+    # print(pd.Series(times).describe().T)
+    mean_time = sum(times)/len(times)
+    accuracy = (multi_label_metrics_eval(predictions, labels))
+    return {"mean_time":mean_time, "accuracy":accuracy}
+
+'''
 class utils(object):
     """Utils class to help run experiments efficiently"""
 
@@ -208,3 +315,4 @@ class utils(object):
             print('Model size: {:.3f}MB'.format(model_size))
         except ModuleNotFoundError as e:
             print("Please pass in a model")
+'''
