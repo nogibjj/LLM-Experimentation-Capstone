@@ -6,6 +6,8 @@
     <br>2.1 Proofpoint
 3. Methodology
     <br>3.1 Experimentation Set Up
+    <br>.   3.1.1 Evaluation Metrics
+    <br>.   3.1.2 Experimentation Configurations
     <br>3.2 Methods
     <br>.   3.2.1 Pruning
     <br>.   3.2.2 Quantization
@@ -30,8 +32,22 @@ We aim to make the process of inference faster and more efficient by leveraging 
 This project was conducted in collaboration with Proofpoint Inc. Proofpoint is a leading cybersecurity company in the US that utilizes natural language and machine learning techniques to detect and mitigate cyberthreats in various communication channels. We developed an interface that Proofpoint may leverage internally to apply on their internal models. However, this library can be utilized by anyone who wishes to deploy large language models at relatively lower costs. 
 
 ## 3. Methodology
+Our experimentation scope is focused on a few network acceleration techniques, specifically in quantization, pruning, and distillation methods. These are techniques of our specific interest as they can be leveraged independently to compress the network, but also in combination with each other to assess synergistic effects on latency and model size. 
+
+We performed our experiments on a smaller model (BERT) and a larger model (TinyLlama-1.1B) to evaluate the generalizability of our methods.
 
 ### 3.1 Experimentation Set Up
+We utilized each technique independently and then in combination with each other to evaluate the method's effect on the model **inference speed**, **model size**, and **accuracy**. 
+
+#### 3.1.1 Evaluation Metrics
+The primary objective of our study is to identify methods that effectively reduce the latency and size of models. Accordingly, the principal metrics adopted for assessing the efficacy of our techniques included average inference time (measured in milliseconds) and model size (measured in megabytes). It is widely acknowledged that optimizing a LLM for reduced size or enhanced speed often involves a trade-off with model accuracy. Therefore, accuracy (measured in percentage) was monitored as a secondary metric in our experiments to ascertain that the integrity of model performance remained largely intact following the application of our methods. Additionally, we documented the training time needed for fine-tuning the model in techniques involving pruning and distillation, although no specific expectations were established for this metric.
+
+#### 3.1.2 Experimentation Configurations
+There were a number of configurations we had to account for in our experimentations: machine, compression methods applied, and task. Due to computational limitations, we weren't able to harmonize all of the configurations across the two models. However, since we are interested in the relative gains of each compression experiment, we can still compare results within the model giving us good insight into the capabilities of each methods. 
+
+Both models were fine-tuned to perform emotions classification on textual content. The task chosen for the BERT model was Emotion Classification of Tweets which was a multi-label classification problem. The dataset had 11 different emotion labels with around ~11k records. Fine-tuning was performed for 5 epochs with a 60-30-10 train-test-validation split. The task chosen for the TinyLlama model was an Emotion Classification of Digital Conversations which was a multiclass classification problem. The dataset had 7 different emotion labels with around ~40k records. All the experimentations were performed on a T4 GPU. 
+
+![High-level overview of our experimentation approach and configurations](image.png)
 
 ### 3.2 Methods
 
