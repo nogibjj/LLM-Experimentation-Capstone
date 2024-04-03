@@ -122,5 +122,5 @@ Additionally, follow the below instructions to run the scripts to perform
 ## 7. Contributors
 [Aditya John](https://www.linkedin.com/in/aditya-john/)<br>
 [Elisa Chen](https://www.linkedin.com/in/elisachenfin/)<br>
-[Jenny (Yiran) Shen]()<br>
+[Yiran (Jenny) Shen](https://www.linkedin.com/in/jennyshen56/)<br>
 [Zhanyi Lin](https://www.linkedin.com/in/zhanyi-lin-b48011206/?trk=public_profile_samename-profile&originalSubdomain=hk)
