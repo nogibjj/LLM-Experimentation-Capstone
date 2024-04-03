@@ -9,16 +9,16 @@
     <br>.   [3.1.1 Evaluation Metrics](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#311-evaluation-metrics)
     <br>.   [3.1.2 Experimentation Configurations](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#312-experimentation-configurations)
     <br>[3.2 Methods](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
-    <br>.   [3.2.1 Pruning](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
-    <br>.   [3.2.2 Quantization](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
-    <br>.   [3.2.3 Network Exchange](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
-    <br>.   [3.2.4 Knowledge Distillation](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
-4. [Results](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
-<br>[4.1 BERT Model](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
-<br>[4.2 TinyLlama Model](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
-5. [Conclusion](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
-6. [Usage Instructions](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
-7. [Contributors](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
+    <br>.   [3.2.1 Pruning](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#321-methods)
+    <br>.   [3.2.2 Quantization](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#322-methods)
+    <br>.   [3.2.3 Network Exchange](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#323-methods)
+    <br>.   [3.2.4 Knowledge Distillation](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#324-methods)
+4. [Results](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#4-results)
+<br>[4.1 BERT Model](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#41-results)
+<br>[4.2 TinyLlama Model](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#42-results)
+5. [Conclusion](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#5-conclusion)
+6. [Usage Instructions](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#6-usage-instructions)
+7. [Contributors](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#7-contributors)
 
 ## 1. Abstract
 Our project addressed the significant challenge of reducing computational and storage costs associated with the deployment of large language models (LLMs). Our objective was to achieve cost-efficiency by minimizing the model size and inference speed without compromising their performance capabilities. This pursuit was motivated by the pressing need to manage the considerable expenses tied to operating LLMs, as exemplified by the substantial daily costs incurred by similar operations at scale.
@@ -111,7 +111,7 @@ There were 4 experiments in total that were effective in increasing the inferenc
 ## 5. Conclusion
 In this project, we experimented with three different compression methods and one network exchange method to compress and acclerate large language models. From our results, we observed that the best results are achieved when methods are used in combination with one another to obtain synergistic advantages on both latency and model size. Static quantization (4-bit) and GPTQ seem to be effective methods in reducing the size of models by **>75%** and improving the accuracy of models through regularization effect. These methods are best combined with pruning and distillation to yield an inference speed gain of **~1.2x - 6x** depending on the model. 
 
-## 6. Usage Instructions - @adityaemmanuel, @zhanyil2
+## 6. Usage Instructions
 Please use the following command to install all the required packages to run our scripts:
 ```
 pip install -r requirements.txt
