@@ -1,102 +1,69 @@
+# pruning.py
 import torch
-from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer
+import numpy as np
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, Trainer, TrainingArguments
 from datasets import load_dataset
+from torch.nn.utils import prune
+from sklearn.metrics import accuracy_score
 import time
-from CompressionMethods.utils import load_data_hf, get_model_size, evaluate_heegyu_augsec, evaluate_sem_eval_2018_task_1_dataset
+import pandas as pd
+from utils import get_model_size, evaluate_heegyu_augsec, evaluate_sem_eval_2018_task_1_dataset, load_data_hf
 
+class ModelPruner:
+    """
+    A class to handle pruning of transformer models for classification tasks.
+    """
+    def __init__(self, model_id, dataset_id=None, dataset_subset_id=None, task="classification"):
+        self.model_id = model_id
+        self.dataset_id = dataset_id
+        self.dataset_subset_id = dataset_subset_id
+        self.task = task
+        self.tokenizer = AutoTokenizer.from_pretrained(model_id)
+        self.model = AutoModelForSequenceClassification.from_pretrained(model_id).to('cuda' if torch.cuda.is_available() else 'cpu')
+        self.dataset = load_data_hf(dataset_id, dataset_subset_id) if dataset_id else None
+        self.original_model_size = get_model_size(self.model)
 
-class PruneModel(object):
-    """Class to handle pruning and fine-tuning of transformer models."""
-
-    def __init__(self, model_name, dataset_name, subtask_name):
+    def apply_global_pruning(self, pruning_percentage=0.2):
         """
-        Initializes the PruneModel class with model, dataset, and utility objects.
-
-        Parameters:
-            model_name (str): The name of the model to be pruned.
-            dataset_name (str): The name of the dataset to be used.
-            subtask_name (str): The specific subtask of the dataset to be used.
+        Apply global L1 unstructured pruning to the model.
         """
-        self.model_name = model_name
-        self.dataset_name = dataset_name
-        self.subtask_name = subtask_name
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = AutoModelForSequenceClassification.from_pretrained(
-            model_name, problem_type="multi_label_classification"
-        ).to(self.device)
-        self.utils = utils(
-            model_name=model_name
-        )  # Initialize utils for dataset processing and metrics
-        self.dataset = self.utils.create_encoded_dataset(
-            load_dataset(dataset_name, subtask_name)
-        )
-
-    def prune_model(self, amount=0.2):
-        """
-        Applies pruning to the model to reduce its size or computation.
-
-        Parameters:
-            amount (float): The proportion of weights to prune away. Default is 0.2 (20%).
-        """
-        parameters_to_prune = (
-            (self.model.bert.embeddings.word_embeddings, "weight"),
-            (self.model.bert.encoder.layer[0].attention.self.query, "weight"),
-            (self.model.bert.encoder.layer[0].attention.self.key, "weight"),
-            (self.model.bert.encoder.layer[0].attention.self.value, "weight"),
-            (self.model.bert.encoder.layer[0].attention.output.dense, "weight"),
-            (self.model.bert.encoder.layer[0].intermediate.dense, "weight"),
-            (self.model.bert.encoder.layer[0].output.dense, "weight"),
-            # Add more layers here as needed for pruning
-        )
-        torch.nn.utils.prune.global_unstructured(
+        parameters_to_prune = []
+        for name, module in self.model.named_modules():
+            if isinstance(module, torch.nn.Linear):
+                parameters_to_prune.append((module, "weight"))
+        prune.global_unstructured(
             parameters_to_prune,
-            pruning_method=torch.nn.utils.prune.L1Unstructured,
-            amount=amount,  # Prune 20% of the weights
+            pruning_method=prune.L1Unstructured,
+            amount=pruning_percentage,
         )
-        # Remove the pruning reparameterization for a cleaner model
-        for module, name in parameters_to_prune:
-            torch.nn.utils.prune.remove(module, name)
-        print("Pruning complete.")
 
-    def fine_tune_pruned_model(
-        self, output_dir, num_train_epochs=3, per_device_train_batch_size=8
-    ):
+    def remove_pruning_reparam(self):
         """
-        Fine-tunes the pruned model on the given dataset.
-
-        Parameters:
-            output_dir (str): Directory to save the fine-tuned model.
-            num_train_epochs (int): Number of epochs for fine-tuning.
-            per_device_train_batch_size (int): Batch size per device for training.
+        Remove the pruning reparameterization to finalize the pruning process.
         """
-        training_args = TrainingArguments(
-            output_dir=output_dir,
-            num_train_epochs=num_train_epochs,
-            per_device_train_batch_size=per_device_train_batch_size,
-            per_device_eval_batch_size=per_device_train_batch_size,
-            evaluation_strategy="epoch",
-            save_strategy="epoch",
-        )
-        trainer = Trainer(
-            model=self.model,
-            args=training_args,
-            compute_metrics=self.utils.compute_metrics,  # Utilize compute_metrics from utils for evaluation
-            train_dataset=self.dataset["train"],
-            eval_dataset=self.dataset["validation"],
-        )
-        trainer.train()
-        self.model.save_pretrained(output_dir)
+        for module in self.model.modules():
+            if isinstance(module, torch.nn.Linear):
+                prune.remove(module, "weight")
+        self.pruned_model_size = get_model_size(self.model)
 
+    def evaluate_model(self, num_samples=1000):
+        """
+        Evaluate the pruned model on the given dataset.
+        """
+        if self.task == "classification" and self.dataset_id == "heegyu/augesc":
+            results = evaluate_heegyu_augsec(self.model, self.tokenizer, self.dataset, num_samples=num_samples)
+        elif self.task == "multi_label_classification" and self.dataset_id == "sem_eval_2018_task_1":
+            results = evaluate_sem_eval_2018_task_1_dataset(self.model, self.tokenizer, self.dataset)
+        else:
+            raise ValueError("Unsupported dataset or task type.")
+        self.evaluation_results = results
 
-# Example usage
-if __name__ == "__main__":
-    model_name = "bert-base-uncased"
-    dataset_name = "sem_eval_2018_task_1"
-    subtask_name = "subtask5.english"
-    output_dir = "./bert-pruned"
-
-    pruner = PruneModel(model_name, dataset_name, subtask_name)
-    pruner.prune_model(amount=0.2)  # Prune 20% of the weights
-    pruner.fine_tune_pruned_model(
-        output_dir, num_train_epochs=3
-    )  # Fine-tune and save the pruned model
+    def summarize_results(self):
+        """
+        Summarize and print the results of the pruning and evaluation.
+        """
+        print(f"Original Model Size: {self.original_model_size:.3f}MB")
+        print(f"Pruned Model Size: {self.pruned_model_size:.3f}MB")
+        print("Evaluation Results:")
+        for key, value in self.evaluation_results.items():
+            print(f"{key.capitalize()}: {value}")
