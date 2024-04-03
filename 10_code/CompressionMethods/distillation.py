@@ -1,8 +1,8 @@
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments, Trainer, DistilBertTokenizer
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments, Trainer, EvalPrediction
 from torch import cuda
 import torch
 import torch.nn.functional as F
-from CompressionMethods.utils import load_data_hf, get_model_size, evaluate_heegyu_augsec, evaluate_sem_eval_2018_task_1_dataset
+from CompressionMethods.utils import load_data_hf, preprocess_bert_data, compute_metrics, get_model_size, evaluate_sem_eval_2018_task_1_dataset
 import time
 
 class KnowledgeDistillationTrainer(Trainer):
@@ -44,23 +44,30 @@ class KnowledgeDistillationTrainer(Trainer):
 class DistillationModule(object):
     """Class for creating a distilled model for BERT"""
 
-    def __init__(self):
+    def __init__(self, teacher_model_id, student_model_id, dataset, sub_dataset = None):
         """Establishing the parameters for the distilled model
         Attributes:
             - self.device: device which the experiments are run on
+            -teacher_model (str): the teacher model on HF used for distillation. For our experimentations, we used fine-tuned BERT model
+            -student_model (str): the student model on HF used for distillation. For our experimentations, we used DistilBERT
+            -dataset (str): the encoded / preprocessed dataset to train the model on
+            -sub_dataset (str):
         """
         self.device = 'cuda' if cuda.is_available() else 'cpu'
+        self.teacher_model_id = teacher_model_id
+        self.student_model_id = student_model_id
+        self.dataset = dataset
+        self.sub_dataset = sub_dataset
+        self.distilled_model = None
 
     def get_device(self):
         """Obtaining the device where experiments are performed"""
         print("Using device: ", self.device)
 
-    def perform_distillation(self, teacher_model_id, student_model_id, dataset, output_dir = "./bert-distilled", learning_rate = 2e-5, batch_size = 8, num_epochs = 5, metric_name = "f1", weight_decay = 0.01, alpha = 0.5, temperature = 2.0, num_labels = 11):
+    def perform_distillation(self, preprocessing_func = None, output_dir = "./bert-distilled", learning_rate = 2e-5, batch_size = 8, num_epochs = 5, metric_name = "f1", weight_decay = 0.01, alpha = 0.5, temperature = 2.0, num_labels = 11):
        """Helper function to perform knowledge distillation.
           Params:
-            teacher_model (str): the teacher model on HF used for distillation. For our experimentations, we used fine-tuned BERT model
-            student_model (str): the student model on HF used for distillation. For our experimentations, we used DistilBERT
-            dataset (dataset): the encoded / preprocessed dataset to train the model on
+            preprocessing_func (method): the function used to preprocess the dataset
             output_dir (str): the output directory with distilled model
             **args for the training process
           Returns:
@@ -80,25 +87,29 @@ class DistillationModule(object):
           metric_for_best_model=metric_name
        )
 
-       student_model = AutoModelForSequenceClassification.from_pretrained(student_model_id, num_labels = num_labels)
+       student_model = AutoModelForSequenceClassification.from_pretrained(self.student_model_id, num_labels = num_labels)
 
        student_model = student_model.to(self.device)
 
-       student_tokenizer = AutoTokenizer.from_pretrained(student_model_id)
+       student_tokenizer = AutoTokenizer.from_pretrained(self.student_model_id)
 
        # Use the fine-tuned model as the teacher
-       teacher_model = AutoModelForSequenceClassification.from_pretrained(teacher_model_id, num_labels = num_labels)
+       teacher_model = AutoModelForSequenceClassification.from_pretrained(self.teacher_model_id, num_labels = num_labels)
 
        teacher_model = teacher_model.to(self.device)
 
-       ut_1 = utils(teacher_model_id, dataset = dataset)
+       dataset = load_data_hf(self.dataset, self.sub_dataset)
 
-       encoded_dataset = ut_1.create_encoded_dataset()
+       if not preprocessing_func:
+          preprocessing_func = preprocess_bert_data
+        
+       encoded_dataset = dataset.map(preprocessing_func, fn_kwargs={'tokenizer' : student_tokenizer}, batched=True, remove_columns=dataset['train'].column_names)
+       encoded_dataset.set_format("torch")
 
        distilled_model = KnowledgeDistillationTrainer(student_model, teacher_model= teacher_model,
                                                         args = student_training_args, train_dataset=encoded_dataset["train"],
                                                         eval_dataset=encoded_dataset["validation"],
-                                                        compute_metrics=ut_1.compute_metrics, 
+                                                        compute_metrics=compute_metrics, 
                                                         tokenizer = student_tokenizer)
        start_time = time.time()
        distilled_model.train()
@@ -108,4 +119,16 @@ class DistillationModule(object):
 
        distilled_model.save_model(output_dir)
 
+       distilled_model = AutoModelForSequenceClassification.from_pretrained(output_dir, num_labels = num_labels).to(self.device)
+
+       self.distilled_model = distilled_model
+
        return distilled_model
+    
+    def calculate_model_size(self):
+       return get_model_size(self.distilled_model)
+    
+    def evaluate_bert_model(self):
+       tokenizer = AutoTokenizer.from_pretrained(self.student_model_id)
+       dataset = load_data_hf(self.dataset, self.sub_dataset)
+       return evaluate_sem_eval_2018_task_1_dataset(self.distilled_model, tokenizer, dataset, self.device)
