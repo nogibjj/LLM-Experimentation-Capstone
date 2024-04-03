@@ -21,7 +21,7 @@ class ONNXconverter(object):
         self.model_load_method = model_load_method
         
         # initalize device as GPU if and only if the user select GPU and cuda is available
-        if device=="gpu" and cuda.is_available():
+        if device=="cuda" and cuda.is_available():
             self.device = "cuda"
         else:
             self.device = "cpu"
@@ -29,11 +29,11 @@ class ONNXconverter(object):
         self.op_version = op_version
         self.architecture = architecture
     
-    def onnx_convert_classification(self, tokenizer_load_method, sample_input, model_checkpoint=None, tokenizer=None, onnx_path=None, device="cpu"):
+    def onnx_convert_classification(self, tokenizer_load_method, sample_input, model_checkpoint=None, tokenizer_checkpoint=None, onnx_path=None, device="cpu"):
         """
         Converts a pre-trained classification or language model to ONNX format for optimized inference.
         
-        This function supports converting models based on BERT or GPT architecture from HuggingFace's Transformers
+        This function supports converting models based on BERT or transformer architecture from HuggingFace's Transformers
         library or custom sources. It requires specifying loading methods for both the model and tokenizer, handling
         them according to the provided sources (HuggingFace, local, or environment).
 
@@ -48,7 +48,7 @@ class ONNXconverter(object):
         - onnx_path (str, optional): File path where the ONNX model will be saved. If not provided, the model is not saved.
         - device (str): Computation device to use ('cpu' or 'cuda') for model conversion.
         - op_ver (int): Specifies the ONNX Operator Set Version to use.
-        - architecture (str): The architecture of the model to convert ('bert' or 'gpt').
+        - architecture (str): The architecture of the model to convert ('bert' or 'transformer').
 
         Returns:
         - The converted ONNX model or None if the conversion fails.
@@ -62,7 +62,7 @@ class ONNXconverter(object):
         if model_load_method in ["huggingface", "local"]:
             if architecture == "bert":
                 model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint).eval().to(device)
-            elif architecture == "gpt":
+            elif architecture == "transformer":
                 model = AutoModelForCausalLM.from_pretrained(model_checkpoint).eval().to(device)
         else:
             print("Unsupported model loading method.")
@@ -70,7 +70,7 @@ class ONNXconverter(object):
 
         # Load the tokenizer
         if tokenizer_load_method in ["huggingface", "local"]:
-            tokenizer = AutoTokenizer.from_pretrained(tokenizer if tokenizer else model_checkpoint)
+            tokenizer = AutoTokenizer.from_pretrained(tokenizer_checkpoint if tokenizer_checkpoint else model_checkpoint)
         else:
             print("Unsupported tokenizer loading method.")
             return None
@@ -83,16 +83,16 @@ class ONNXconverter(object):
         # Prepare the sample input for ONNX export by tokenizing it according to the model's needs
         inputs = tokenizer(sample_input, return_tensors="pt", padding=True, truncation=True).to(device)
         # Determine input arguments based on model architecture
-        input_args = (inputs['input_ids'],) if architecture == "gpt" else (inputs['input_ids'], inputs['attention_mask'])
+        input_args = (inputs['input_ids'],) if architecture == "transformer" else (inputs['input_ids'], inputs['attention_mask'])
 
         # Perform the ONNX export
         torch.onnx.export(model,
                         args=input_args,
                         f=onnx_path,
-                        input_names=['input_ids'] if architecture == "gpt" else ['input_ids', 'attention_mask'],
+                        input_names=['input_ids'] if architecture == "transformer" else ['input_ids', 'attention_mask'],
                         output_names=['logits'],
                         dynamic_axes={'input_ids': {0: 'batch_size', 1: 'sequence_length'},
-                                        'attention_mask': {0: 'batch_size', 1: 'sequence_length'} if architecture != "gpt" else {},
+                                        'attention_mask': {0: 'batch_size', 1: 'sequence_length'} if architecture != "transformer" else {},
                                         'logits': {0: 'batch_size'}},
                         opset_version=op_ver)
 
