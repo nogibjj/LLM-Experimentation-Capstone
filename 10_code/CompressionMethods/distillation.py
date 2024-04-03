@@ -2,7 +2,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer, Trai
 from torch import cuda
 import torch
 import torch.nn.functional as F
-from .utils import utils
+from CompressionMethods.utils import load_data_hf, get_model_size, evaluate_heegyu_augsec, evaluate_sem_eval_2018_task_1_dataset
 import time
 
 class KnowledgeDistillationTrainer(Trainer):

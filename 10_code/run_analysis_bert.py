@@ -1,13 +1,11 @@
-from CompressionMethods import static_quantization, utils
+from CompressionMethods import static_quantization, distillation, GPTQQuantizer, pruning
 from dataclasses import dataclass, field
-from typing import Optional, Tuple
+from typing import Optional
 from dataclasses import field
-# from NetworkExMethods import onnx_converter
-
+import pandas as pd
 # Libary Imports
-import traceback
-from transformers import HfArgumentParser, AutoModelForSequenceClassification, AutoTokenizer
-from datasets import load_dataset
+from transformers import HfArgumentParser
+
 
 @dataclass
 class ScriptArguments:
@@ -28,3 +26,21 @@ print(f"--dataset_subtask: {script_args.dataset_subtask}")
 
 staticQuantizationObject = static_quantization.staticQuantization(model_id=script_args.model, dataset_id=script_args.dataset, dataset_subsetid=script_args.dataset_subtask)
 staticQuantizationObject.run_experiment()
+
+distillationObject = distillation.KnowledgeDistillationTrainer(model_id=script_args.model, dataset_id=script_args.dataset, dataset_subsetid=script_args.dataset_subtask)
+distillationObject.run_experiment()
+
+pruningObject = pruning.PruneModel(model_id=script_args.model, dataset_id=script_args.dataset, dataset_subsetid=script_args.dataset_subtask)
+pruningObject.run_experiment()
+
+gptqQuantizationObject = GPTQQuantizer.GPTQQuantizer(model_id=script_args.model, dataset_id=script_args.dataset, dataset_subsetid=script_args.dataset_subtask)
+gptqQuantizationObject.run_experiment()
+
+results = pd.DataFrame([
+    staticQuantizationObject.results_4bit, 
+    staticQuantizationObject.results_8bit, 
+    distillationObject.results, 
+    pruningObject.results, 
+    gptqQuantizationObject.results])
+
+results.to_csv("bert_results.csv", index=False)

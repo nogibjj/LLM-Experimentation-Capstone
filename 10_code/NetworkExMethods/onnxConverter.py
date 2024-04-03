@@ -1,6 +1,6 @@
 import torch
 from torch import cuda
-from torchao.quantization import quant_api
+from torch.ao.quantization import quant_api
 from sklearn.metrics import accuracy_score
 from datasets import load_dataset
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, BitsAndBytesConfig
