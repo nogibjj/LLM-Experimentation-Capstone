@@ -124,12 +124,30 @@ For those interested in replicating our experiment or delving deeper into our me
 In this project, we experimented with three different compression methods and one network exchange method to compress and acclerate large language models. From our results, we observed that the best results are achieved when methods are used in combination with one another to obtain synergistic advantages on both latency and model size. Static quantization (4-bit) and GPTQ seem to be effective methods in reducing the size of models by **>75%** and improving the accuracy of models through regularization effect. These methods are best combined with pruning and distillation to yield an inference speed gain of **~1.2x - 6x** depending on the model. 
 
 ## 6. Usage Instructions
-Please use the following command to install all the required packages to run our scripts:
+
 ```
+# Create a virutal env to install the requierd packages
+python -m venv /path/to/new/virtual/environment
+source /path/to/new/virtual/environment/bin/activate
+
+# Clone the repository and install the required packages
+git clone https://github.com/nogibjj/LLM-Experimentation-Capstone.git
+cd LLM-Experimentation-Capstone
 pip install -r requirements.txt
+
+# Run the analysis script to perform the required experimentation
+cd 10_code
+python run_analysis.py --model_name <<name of the model>> --dataset <<dataset name>> --dataset_subtask (optional) <<name of the dataset subsection>>
 ```
-Additionally, follow the below instructions to run the scripts to perform
-...
+The code will run all the experiments as mentioned in Section 3.1.2. Please take care to note that not all experiments are compatible with every model type (For example, Knowledge Distillation can only be applied to BERT)
+The code will store the models of each method and output a csv with the following information 
+    1. Method Name
+    2. Model Size
+    3. Average Inference Time
+    4. Accuracy
+
+
+
 
 ## 7. Contributors
 [Aditya John](https://www.linkedin.com/in/aditya-john/)<br>
