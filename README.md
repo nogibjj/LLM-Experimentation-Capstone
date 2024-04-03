@@ -52,12 +52,38 @@ Both models were fine-tuned to perform emotions classification on textual conten
 ### 3.2 Methods
 
 #### 3.2.1 Pruning
+Pruning in the context of neural networks is a crucial technique aimed at reducing the complexity of a model without significantly affecting its performance. This process involves eliminating certain elements of the network, such as weights or neurons, based on specific criteria. There are two primary types of pruning: structured and unstructured. Structured pruning involves removing entire channels or layers from the network, leading to a more compact architecture that can be more efficiently executed on hardware. Unstructured pruning, on the other hand, removes individual weights, resulting in a sparser network. One common method of unstructured pruning is magnitude pruning, where weights with the smallest absolute values are pruned away, under the assumption that they contribute the least to the network's output. For our experimentations, we used magnitude pruning to eliminate unimportant weights from the neural net.
+
+![alt text](image-3.png)
+
+After pruning, it's essential to perform fine-tuning, which involves retraining the network on its original task. This step helps the network to recover from any performance loss incurred during pruning and to adapt its remaining weights for optimal performance. Fine-tuning ensures that the pruned network maintains its accuracy and efficiency, making pruning a valuable tool in optimizing neural networks for deployment.
 
 #### 3.2.2 Quantization
+Quantization is the process of lowering the precision of the model parameters to reduce their memory footprint and increase computation speed. Given its ease of implementation and minimal complexity, quantization is a rather popular technique applied to compressing deep learning models. However, the effect of quantization varies significantly depending on the hardware being used, and therefore care must be taken to ensure the right type of quantization is performed for the right hardware setup. 
+
+![alt text](image-2.png)
+
+In our experiments, the scope was limited to post-training quantization, which is the process of quantizing an already fine-tuned model. Quantization has shown promising results empirically in the recent years, which is why we decided to further explore three different quantization techniques outlined below:
+
+1) 4/8 - bit static quantization
+2) GPTQ (2023): 
+3) AWQ (2023):
 
 #### 3.2.3 Network Exchange
+The process begins by converting a pre-trained model into the ONNX format. ONNX acts as an intermediary, providing a hardware-agnostic representation that encapsulates the complexity of neural networks. This conversion is crucial for ensuring compatibility across different environments.
+
+Once in ONNX format, the model is further optimized using the OpenVINO toolkit, tailored specifically for Intel hardware including CPUs, GPUs, FPGAs, and VPUs (Visual Processing Units). OpenVINO enhances the interaction between the model and the hardware, optimizing the computational tasks to align with the hardware’s architecture. This not only maximizes throughput and minimizes latency but also ensures that the model's performance is consistent and efficient, regardless of the deployment environment.
+
+The optimization includes techniques like layer fusion, asynchronous execution, and operation elimination, which significantly reduce the model size. This results in a smaller memory footprint and faster inference times, crucial for applications in diverse hardware settings. Ultimately, this methodology solves the problem of deploying machine learning models consistently and efficiently across various hardware platforms and frameworks, a fundamental challenge in the field of AI.
+
+![alt text](image-4.png)
 
 #### 3.2.3 Knowledge Distillation
+In knowledge distillation, information is transferred from a teacher model (often larger and pre-trained) to a student (distilled) model that approximates the original function learned by the teacher network. This is achieved by training the student model using the class probabilities produced by the teacher model as soft targets. When the soft targets have high entropy, they provide more information about the relationship between the classes than hard targets (one-hot encoded), and the smooth probability distributions help prevent overfitting [2]. The empirical research has shown that the student model can often be trained on less data and less complex architecture to perform similarly to the teacher model. 
+
+![alt text](image-5.png)
+
+One of the key challenges in knowledge distillation is finding a suitable student model to train. Ideally, the architecture of the student model is substantially smaller in size than the teacher model while retaining a majority of its performance. For more renowned models like BERT and GPT, student models have been created (e.g. DistilBERT, TinyBERT, DistilGPT-2) using methods like transformer distillation. Several techniques can be used, including transformer distillation, neural architecture search, and pruning-based methods to discover apt student architectures for distillation purposes, but this typically requires a vast amount of computational resources. 
 
 ## 4. Results
 
