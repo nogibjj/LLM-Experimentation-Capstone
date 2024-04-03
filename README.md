@@ -108,6 +108,18 @@ There were 4 experiments in total that were effective in increasing the inferenc
 
 ![alt text](./20_intermediate_files/images/image-llm-results-2.png)
 
+### 4.3 Network Exchange (ONNX)
+The final stage of our experiment involved bridging the gap between theoretical findings and their application within a real-world production setting. To facilitate this transition, we utilized ONNX for model portability and interoperability. Specifically, we converted several models, including BERT, Distilled BERT, Base TinyLlama, GPTQ TinyLlama, and AWQ TinyLlama, from their original PyTorch implementations to the ONNX format.
+
+Our findings reveal a notable improvement in computational efficiency, with the average inference speed doubling and inference time halving. This enhancement in performance did not come at the cost of accuracy or model size, which remained largely unaffected. These results were consistently observed across various hardware configurations, including T4 and V100 GPUs as well as a 16-core Intel CPU. Detailed outcomes pertaining to the T4 GPU are provided below for reference.
+
+The model optimization and conversion processes were carried out on a GPU. However, the resulting ONNX models are versatile enough to be deployed on CPUs, ensuring broad applicability.
+
+For those interested in replicating our experiment or delving deeper into our methodology, the complete procedure is documented in [10_code/NetworkExMethods](https://github.com/nogibjj/LLM-Experimentation-Capstone/tree/main/10_code/NetworkExMethods) within our GitHub repository.
+
+![WeChat541cd9882d95b28053438e12bb7f590f](https://github.com/nogibjj/LLM-Experimentation-Capstone/assets/55003943/873dc7d7-bcd1-41da-88ae-a666dce1844d)
+
+
 ## 5. Conclusion
 In this project, we experimented with three different compression methods and one network exchange method to compress and acclerate large language models. From our results, we observed that the best results are achieved when methods are used in combination with one another to obtain synergistic advantages on both latency and model size. Static quantization (4-bit) and GPTQ seem to be effective methods in reducing the size of models by **>75%** and improving the accuracy of models through regularization effect. These methods are best combined with pruning and distillation to yield an inference speed gain of **~1.2x - 6x** depending on the model. 
 
