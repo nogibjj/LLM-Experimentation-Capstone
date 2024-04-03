@@ -111,7 +111,7 @@ There were 4 experiments in total that were effective in increasing the inferenc
 ### 4.3 Network Exchange (ONNX)
 The final stage of our experiment involved bridging the gap between theoretical findings and their application within a real-world production setting. To facilitate this transition, we utilized ONNX for model portability and interoperability. Specifically, we converted several models, including BERT, Distilled BERT, Base TinyLlama, GPTQ TinyLlama, and AWQ TinyLlama, from their original PyTorch implementations to the ONNX format.
 
-Our findings reveal a notable improvement in computational efficiency, with the average inference speed doubling and inference time halving. This enhancement in performance did not come at the cost of accuracy or model size, which remained largely unaffected. These results were consistently observed across various hardware configurations, including T4 and V100 GPUs as well as a 16-core Intel CPU. Detailed outcomes pertaining to the T4 GPU are provided below for reference.
+Our findings reveal a notable improvement in computational efficiency, with the average inference speed **~2x** and inference time **halving**. This enhancement in performance did not come at the cost of accuracy or model size, which remained largely unaffected. These results were consistently observed across various hardware configurations, including T4 and V100 GPUs as well as a 16-core Intel CPU. Detailed outcomes pertaining to the T4 GPU are provided below for reference.
 
 The model optimization and conversion processes were carried out on a GPU. However, the resulting ONNX models are versatile enough to be deployed on CPUs, ensuring broad applicability.
 
