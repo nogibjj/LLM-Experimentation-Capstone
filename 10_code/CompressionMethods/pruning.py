@@ -2,9 +2,7 @@ import torch
 from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer
 from datasets import load_dataset
 import time
-from utils import (
-    utils,
-)  # Import the utility class you provided for handling data preprocessing and metrics
+from CompressionMethods.utils import load_data_hf, get_model_size, evaluate_heegyu_augsec, evaluate_sem_eval_2018_task_1_dataset
 
 
 class PruneModel(object):

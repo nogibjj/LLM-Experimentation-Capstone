@@ -1,12 +1,12 @@
 from CompressionMethods import static_quantization, distillation, GPTQQuantizer, pruning
+from NetworkExMethods import onnxConverter
 from dataclasses import dataclass, field
 from typing import Optional
 from dataclasses import field
 
 # Libary Imports
-from transformers import HfArgumentParser, AutoModelForSequenceClassification, AutoTokenizer
-from datasets import load_dataset
-
+from transformers import HfArgumentParser
+import pandas as pd
 @dataclass
 class ScriptArguments:
     """
@@ -40,3 +40,12 @@ pruningObject.run_experiment()
 
 gptqQuantizationObject = GPTQQuantizer.GPTQQuantizer(model_id=script_args.model, dataset_id=script_args.dataset, dataset_subsetid=script_args.dataset_subtask)
 gptqQuantizationObject.run_experiment()
+
+results = pd.DataFrame([
+    staticQuantizationObject.results_4bit, 
+    staticQuantizationObject.results_8bit, 
+    distillationObject.results, 
+    pruningObject.results, 
+    gptqQuantizationObject.results])
+
+results.to_csv("llm_results.csv", index=False)

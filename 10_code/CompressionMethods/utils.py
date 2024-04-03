@@ -39,8 +39,6 @@ def get_model_size(model):
         buffer_size += buffer.nelement() * buffer.element_size()
 
     model_size = (param_size + buffer_size) / 1024**2
-    print('Model size: {:.3f}MB'.format(model_size))
-
     return model_size
 
 def multi_label_metrics_eval(predictions, labels, threshold=0.5):
