@@ -1,24 +1,24 @@
 # Neural Network Acceleration & Compression Experimentations
 
 ## Table of Contents
-1. Abstract
-2. Project Objective & Goals
-    <br>2.1 Proofpoint
-3. Methodology
-    <br>3.1 Experimentation Set Up
-    <br>.   3.1.1 Evaluation Metrics
-    <br>.   3.1.2 Experimentation Configurations
-    <br>3.2 Methods
-    <br>.   3.2.1 Pruning
-    <br>.   3.2.2 Quantization
-    <br>.   3.2.3 Network Exchange
-    <br>.   3.2.4 Knowledge Distillation
-4. Results
-<br>4.1 BERT Model
-<br>4.2 TinyLlama Model
-5. Conclusion
-6. Usage Instructions
-7. Contributors
+1. [Abstract](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#1-abstract)
+2. [Project Objective & Goals](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#1-abstract)
+    <br>[2.1 Proofpoint](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#21-proofpoint)
+3. [Methodology](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#3-methodology)
+    <br>[3.1 Experimentation Set Up](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#31-experimentation-set-up)
+    <br>.   [3.1.1 Evaluation Metrics](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#311-evaluation-metrics)
+    <br>.   [3.1.2 Experimentation Configurations](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#312-experimentation-configurations)
+    <br>[3.2 Methods](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
+    <br>.   [3.2.1 Pruning](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
+    <br>.   [3.2.2 Quantization](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
+    <br>.   [3.2.3 Network Exchange](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
+    <br>.   [3.2.4 Knowledge Distillation](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
+4. [Results](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
+<br>[4.1 BERT Model](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
+<br>[4.2 TinyLlama Model](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
+5. [Conclusion](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
+6. [Usage Instructions](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
+7. [Contributors](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#32-methods)
 
 ## 1. Abstract
 Our project addressed the significant challenge of reducing computational and storage costs associated with the deployment of large language models (LLMs). Our objective was to achieve cost-efficiency by minimizing the model size and inference speed without compromising their performance capabilities. This pursuit was motivated by the pressing need to manage the considerable expenses tied to operating LLMs, as exemplified by the substantial daily costs incurred by similar operations at scale.
@@ -67,9 +67,9 @@ Quantization is the process of lowering the precision of the model parameters to
 
 In our experiments, the scope was limited to post-training quantization, which is the process of quantizing an already fine-tuned model. Quantization has shown promising results empirically in the recent years, which is why we decided to further explore three different quantization techniques outlined below:
 
-1) 4/8 - bit static quantization
-2) GPTQ (2023): 
-3) AWQ (2023):
+1) **4/8 - bit static quantization**: a post-training quantization method that uses block-wise quantization to maintain 32-bit performance at a small fraction of the memory cost.
+2) **GPTQ**: a post-training quantization method that performs a layerwise quantization using one-shot quantization method based on approximate second-order information of loss function. GPTQ algorithm finds the Hessian inverse using a Cholesky kernel and recursively updates the weights.
+3) **AWQ**: Activation Aware Weight Quantization is a post-training quantization method that determines the importance of weights based on the activation values. It will leave the top 1% of the weights unquantized to preserve a significant portion of the performance.
 
 #### 3.2.3 Network Exchange
 The process begins by converting a pre-trained model into the ONNX format. ONNX acts as an intermediary, providing a hardware-agnostic representation that encapsulates the complexity of neural networks. This conversion is crucial for ensuring compatibility across different environments.
