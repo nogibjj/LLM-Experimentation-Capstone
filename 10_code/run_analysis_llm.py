@@ -1,4 +1,4 @@
-from CompressionMethods import static_quantization
+from CompressionMethods import static_quantization, distillation, GPTQQuantizer, pruning
 from dataclasses import dataclass, field
 from typing import Optional
 from dataclasses import field
@@ -32,3 +32,11 @@ print(f"--dataset_subtask: {script_args.dataset_subtask}")
 staticQuantizationObject = static_quantization.staticQuantization(model_id=script_args.model, dataset_id=script_args.dataset, dataset_subsetid=script_args.dataset_subtask)
 staticQuantizationObject.run_experiment()
 
+distillationObject = distillation.KnowledgeDistillationTrainer(model_id=script_args.model, dataset_id=script_args.dataset, dataset_subsetid=script_args.dataset_subtask)
+distillationObject.run_experiment()
+
+pruningObject = pruning.PruneModel(model_id=script_args.model, dataset_id=script_args.dataset, dataset_subsetid=script_args.dataset_subtask)
+pruningObject.run_experiment()
+
+gptqQuantizationObject = GPTQQuantizer.GPTQQuantizer(model_id=script_args.model, dataset_id=script_args.dataset, dataset_subsetid=script_args.dataset_subtask)
+gptqQuantizationObject.run_experiment()
