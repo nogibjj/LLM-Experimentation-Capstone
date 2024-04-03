@@ -140,11 +140,13 @@ cd 10_code
 python run_analysis.py --model_name <<name of the model>> --dataset <<dataset name>> --dataset_subtask (optional) <<name of the dataset subsection>>
 ```
 The code will run all the experiments as mentioned in Section 3.1.2. Please take care to note that not all experiments are compatible with every model type (For example, Knowledge Distillation can only be applied to BERT)
+
 The code will store the models of each method and output a csv with the following information 
-    1. Method Name
-    2. Model Size
-    3. Average Inference Time
-    4. Accuracy
+
+1. Method Name
+2. Model Size
+3. Average Inference Time
+4. Accuracy
 
 
 
