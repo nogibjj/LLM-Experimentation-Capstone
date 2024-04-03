@@ -1,4 +1,3 @@
-# pruning.py
 import torch
 import numpy as np
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, Trainer, TrainingArguments
@@ -67,3 +66,30 @@ class ModelPruner:
         print("Evaluation Results:")
         for key, value in self.evaluation_results.items():
             print(f"{key.capitalize()}: {value}")
+
+############## sample usage ###############
+# from pruning import ModelPruner
+
+# # Define the model and dataset identifiers
+# model_id = "bert-base-uncased"  # Example model identifier
+# dataset_id = "heegyu/augesc"  # Example dataset identifier
+# dataset_subset_id = None  # Adjust as necessary for your dataset
+
+# # Initialize the ModelPruner
+# pruner = ModelPruner(model_id=model_id, dataset_id=dataset_id, dataset_subset_id=dataset_subset_id, task="classification")
+
+# # Apply global pruning to the model
+# print("Applying global pruning...")
+# pruner.apply_global_pruning(pruning_percentage=0.2)
+
+# # Remove the pruning reparameterization to finalize the pruning process
+# print("Removing pruning reparameterization...")
+# pruner.remove_pruning_reparam()
+
+# # Evaluate the pruned model on the specified dataset
+# print("Evaluating the pruned model...")
+# pruner.evaluate_model(num_samples=1000)
+
+# # Summarize and print the results of the pruning and evaluation
+# print("Summarizing results...")
+# pruner.summarize_results()
