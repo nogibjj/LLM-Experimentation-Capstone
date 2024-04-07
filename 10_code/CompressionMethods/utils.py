@@ -192,6 +192,10 @@ def compute_metrics(p: EvalPrediction):
         predictions=preds, 
         labels=p.label_ids)
     return result
+
+def save_model(model, tokenizer, model_path):
+    model.save_pretrained(model_path)
+    tokenizer.save_pretrained(model_path)
 '''
 class utils(object):
     """Utils class to help run experiments efficiently"""

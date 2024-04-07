@@ -1,6 +1,7 @@
-from CompressionMethods.utils import load_data_hf, get_model_size, evaluate_heegyu_augsec, evaluate_sem_eval_2018_task_1_dataset
+from CompressionMethods.utils import load_data_hf, get_model_size, evaluate_heegyu_augsec, evaluate_sem_eval_2018_task_1_dataset, save_model
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from pprint import pprint
+
 class staticQuantization(object):
     """
     Class that contains all the necessary functions to 4-bit and 8-bit quantize a model
@@ -9,6 +10,7 @@ class staticQuantization(object):
         self.model_id = model_id
         self.dataset_id = dataset_id
         self.dataset_subsetid = dataset_subsetid
+        self.dataset = load_data_hf(dataset_id, dataset_subsetid)
 
         self.results_4bit = {}
         self.results_4bit['method'] = '4bit-static-quantization'
@@ -21,12 +23,13 @@ class staticQuantization(object):
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_id)
         
-        self.dataset = load_data_hf(dataset_id, dataset_subsetid)
+        
 
-    def quantize_model(self):
+    def compress_model(self):
         pass
 
     def run_experiment(self):
+        # self.compress_model = self.compress_model(self.base_model)
         self.results_4bit['size'] = get_model_size(self.model_4_bit)
         self.results_8bit['size'] = get_model_size(self.model_8_bit)
 
