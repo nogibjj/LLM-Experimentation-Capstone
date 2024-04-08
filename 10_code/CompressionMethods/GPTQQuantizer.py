@@ -7,24 +7,23 @@ class gptqQuantization(object):
   """
   Class that contains all the necessary functions to peform GPTQ Quantization on a model
   """
-  def __init__(self, model_id, dataset_id, dataset_subsetid, is_llama=False, is_bert=True, bits=4, ):
+  def __init__(self, model_id, dataset_id, dataset_subsetid, model_type, is_llama=False, is_bert=True, bits=4):
     self.model_id = model_id
     self.dataset_id = dataset_id
     self.dataset_subsetid = dataset_subsetid
     self.dataset = load_data_hf(dataset_id, dataset_subsetid) 
     self.tokenizer = AutoTokenizer.from_pretrained(model_id)
-
+    self.model_type = model_type
     self.results_gptq = {}
     self.results_gptq['method'] = 'GPTQ-quantization'
 
-    self.quantization_config = GPTQConfig(bits = bits, tokenizer = self.tokenizer, dataset="c4", block_name_to_quantize='bert.encoder.layer')
+    if self.model_type == 'bert':
+      self.quantization_config = GPTQConfig(bits = bits, tokenizer = self.tokenizer, dataset="c4", block_name_to_quantize='bert.encoder.layer')
+
+    elif self.model_type == 'llama':
+      self.quantization_config = GPTQConfig(bits = bits, tokenizer = self.tokenizer, dataset="c4", use_exllama=False)
+
     self.gptq_quantized_model = AutoModelForSequenceClassification.from_pretrained(model_id, quantization_config=self.quantization_config).to("cuda")
-
-    if not is_llama:
-      self.gptq_quantized_model.config.quantization_config.use_exllama = False
-
-    if is_bert:
-      self.gptq_quantized_model.config.quantization_config.block_name_to_quantize = 'bert.encoder.layer'
 
   def compress_model(self):
     pass
@@ -46,3 +45,5 @@ class gptqQuantization(object):
     print("Results of GPTQ  Quantization:")
     pprint(self.results_gptq)
     print('#'*100)
+
+    save_model(self.gptq_quantized_model, self.tokenizer, self.model_id, "gptq-quantized")

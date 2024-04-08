@@ -162,3 +162,5 @@ cython_debug/
 virtual-env/*
 
 *_results.csv
+
+models/

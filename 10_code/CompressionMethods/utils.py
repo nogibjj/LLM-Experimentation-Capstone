@@ -17,9 +17,9 @@ def load_data_hf(dataset_id = None, dataset_subid = None):
         dataset (tensor): dataset object
     """
     if not dataset_subid:
-        dataset = load_dataset(dataset_id)
+        dataset = load_dataset(dataset_id, trust_remote_code=True)
     else:
-        dataset = load_dataset(dataset_id, dataset_subid)
+        dataset = load_dataset(dataset_id, dataset_subid, trust_remote_code=True)
     return dataset
 
 def get_model_size(model):
@@ -193,7 +193,9 @@ def compute_metrics(p: EvalPrediction):
         labels=p.label_ids)
     return result
 
-def save_model(model, tokenizer, model_path):
+def save_model(model, tokenizer, model_id, compression_type):
+    model_name = model_id.split('/')[-1]
+    model_path = f"models/{model_name}/{compression_type}"
     model.save_pretrained(model_path)
     tokenizer.save_pretrained(model_path)
 '''
