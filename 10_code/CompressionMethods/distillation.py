@@ -2,8 +2,9 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer, Trai
 from torch import cuda
 import torch
 import torch.nn.functional as F
-from CompressionMethods.utils import load_data_hf, preprocess_bert_data, compute_metrics, get_model_size, evaluate_sem_eval_2018_task_1_dataset
+from CompressionMethods.utils import load_data_hf, preprocess_bert_data, compute_metrics, get_model_size, evaluate_sem_eval_2018_task_1_dataset, save_model
 import time
+from pprint import pprint
 
 class KnowledgeDistillationTrainer(Trainer):
   def __init__(self, *args, teacher_model=None, temperature = 2.0, alpha = 0.5, **kwargs):
@@ -58,7 +59,10 @@ class DistillationModule(object):
         self.student_model_id = student_model_id
         self.dataset = dataset
         self.sub_dataset = sub_dataset
+        self.tokenizer = None
         self.distilled_model = None
+        self.results_distillation = {}
+        self.results_distillation['method'] = 'Distillation (BERT Only)'
 
     def get_device(self):
         """Obtaining the device where experiments are performed"""
@@ -93,6 +97,8 @@ class DistillationModule(object):
 
        student_tokenizer = AutoTokenizer.from_pretrained(self.student_model_id)
 
+       self.tokenizer = student_tokenizer
+
        # Use the fine-tuned model as the teacher
        teacher_model = AutoModelForSequenceClassification.from_pretrained(self.teacher_model_id, num_labels = num_labels)
 
@@ -122,6 +128,7 @@ class DistillationModule(object):
        distilled_model = AutoModelForSequenceClassification.from_pretrained(output_dir, num_labels = num_labels).to(self.device)
 
        self.distilled_model = distilled_model
+       save_model(self.distilled_model, self.tokenizer, self.teacher_model_id, "distilled")
 
        return distilled_model
     
@@ -132,3 +139,15 @@ class DistillationModule(object):
        tokenizer = AutoTokenizer.from_pretrained(self.student_model_id)
        dataset = load_data_hf(self.dataset, self.sub_dataset)
        return evaluate_sem_eval_2018_task_1_dataset(self.distilled_model, tokenizer, dataset, self.device)
+
+    def run_experiment(self):
+       distilled_model = self.perform_distillation()
+       self.results_distillation['size'] = get_model_size(distilled_model)
+
+       dataset = load_data_hf(self.dataset, self.sub_dataset)
+       eval_results_distillation = evaluate_sem_eval_2018_task_1_dataset(distilled_model, self.tokenizer, dataset)
+       self.results_distillation.update(eval_results_distillation)
+
+       print("Results of Distillation:")
+       pprint(self.results_distillation)
+       print('#'*100)

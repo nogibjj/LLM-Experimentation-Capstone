@@ -28,9 +28,6 @@ print(f"--model_type: {script_args.model_type}")
 staticQuantizationObject = static_quantization.staticQuantization(model_id=script_args.model, dataset_id=script_args.dataset, dataset_subsetid=script_args.dataset_subtask)
 staticQuantizationObject.run_experiment()
 
-# distillationObject = distillation.KnowledgeDistillationTrainer(model_id=script_args.model, dataset_id=script_args.dataset, dataset_subsetid=script_args.dataset_subtask)
-# distillationObject.run_experiment()
-
 # pruningObject = pruning.PruneModel(model_id=script_args.model, dataset_id=script_args.dataset, dataset_subsetid=script_args.dataset_subtask)
 # pruningObject.run_experiment()
 
