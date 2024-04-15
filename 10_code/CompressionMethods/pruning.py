@@ -6,9 +6,9 @@ from torch.nn.utils import prune
 from sklearn.metrics import accuracy_score
 import time
 import pandas as pd
-from utils import get_model_size, evaluate_heegyu_augsec, evaluate_sem_eval_2018_task_1_dataset, load_data_hf
+from utils import get_model_size, evaluate_heegyu_augsec, evaluate_sem_eval_2018_task_1_dataset, save_model, load_data_hf
 
-class ModelPruner:
+class PruneModel:
     """
     A class to handle pruning of transformer models for classification tasks.
     """
@@ -21,6 +21,8 @@ class ModelPruner:
         self.model = AutoModelForSequenceClassification.from_pretrained(model_id).to('cuda' if torch.cuda.is_available() else 'cpu')
         self.dataset = load_data_hf(dataset_id, dataset_subset_id) if dataset_id else None
         self.original_model_size = get_model_size(self.model)
+        self.results = {}  # Dictionary to store results
+        self.results['method'] = 'Pruning'
 
     def apply_global_pruning(self, pruning_percentage=0.2):
         """
@@ -50,12 +52,28 @@ class ModelPruner:
         Evaluate the pruned model on the given dataset.
         """
         if self.task == "classification" and self.dataset_id == "heegyu/augesc":
-            results = evaluate_heegyu_augsec(self.model, self.tokenizer, self.dataset, num_samples=num_samples)
+            eval_results = evaluate_heegyu_augsec(self.model, self.tokenizer, self.dataset, num_samples=num_samples)
         elif self.task == "multi_label_classification" and self.dataset_id == "sem_eval_2018_task_1":
-            results = evaluate_sem_eval_2018_task_1_dataset(self.model, self.tokenizer, self.dataset)
+            eval_results = evaluate_sem_eval_2018_task_1_dataset(self.model, self.tokenizer, self.dataset)
         else:
             raise ValueError("Unsupported dataset or task type.")
-        self.evaluation_results = results
+        self.results.update(eval_results)  
+
+    def run_experiment(self):
+        print("Applying global pruning...")
+        self.apply_global_pruning(pruning_percentage=0.2)
+
+        print("Removing pruning reparameterization...")
+        self.remove_pruning_reparam()
+
+        print("Evaluating the pruned model...")
+        self.evaluate_model(num_samples=1000)
+
+        print("Saving the pruned model...")
+        save_model(self.model, self.tokenizer, self.model_id, "pruned")  # Save the model with a designated type
+
+        print("Summarizing results...")
+        self.summarize_results()
 
     def summarize_results(self):
         """
@@ -64,32 +82,5 @@ class ModelPruner:
         print(f"Original Model Size: {self.original_model_size:.3f}MB")
         print(f"Pruned Model Size: {self.pruned_model_size:.3f}MB")
         print("Evaluation Results:")
-        for key, value in self.evaluation_results.items():
+        for key, value in self.results.items():
             print(f"{key.capitalize()}: {value}")
-
-############## sample usage ###############
-# from pruning import ModelPruner
-
-# # Define the model and dataset identifiers
-# model_id = "bert-base-uncased"  # Example model identifier
-# dataset_id = "heegyu/augesc"  # Example dataset identifier
-# dataset_subset_id = None  # Adjust as necessary for your dataset
-
-# # Initialize the ModelPruner
-# pruner = ModelPruner(model_id=model_id, dataset_id=dataset_id, dataset_subset_id=dataset_subset_id, task="classification")
-
-# # Apply global pruning to the model
-# print("Applying global pruning...")
-# pruner.apply_global_pruning(pruning_percentage=0.2)
-
-# # Remove the pruning reparameterization to finalize the pruning process
-# print("Removing pruning reparameterization...")
-# pruner.remove_pruning_reparam()
-
-# # Evaluate the pruned model on the specified dataset
-# print("Evaluating the pruned model...")
-# pruner.evaluate_model(num_samples=1000)
-
-# # Summarize and print the results of the pruning and evaluation
-# print("Summarizing results...")
-# pruner.summarize_results()
