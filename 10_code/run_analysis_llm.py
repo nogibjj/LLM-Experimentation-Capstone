@@ -1,4 +1,4 @@
-from CompressionMethods import static_quantization, distillation, GPTQQuantizer
+from CompressionMethods import static_quantization, GPTQQuantizer, pruning, AWQQuantizer
 from dataclasses import dataclass, field
 from typing import Optional
 from dataclasses import field
@@ -40,9 +40,10 @@ awqQuantizationObject.run_experiment()
 results = pd.DataFrame([
     staticQuantizationObject.results_4bit, 
     staticQuantizationObject.results_8bit, 
-    # distillationObject.results, 
-    # pruningObject.results, 
-    gptqQuantizationObject.results_gptq])
+    pruningObject.results, 
+    gptqQuantizationObject.results_gptq,
+    awqQuantizationObject.results_awq
+    ])
 
 model_name = script_args.model.split("/")[-1]
 results.to_csv(f"{model_name}_results.csv", index=False)
