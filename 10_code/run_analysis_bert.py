@@ -42,7 +42,7 @@ results = pd.DataFrame([
     staticQuantizationObject.results_4bit, 
     staticQuantizationObject.results_8bit, 
     distillationObject.results_distillation, 
-    # pruningObject.results, 
+    pruningObject.results, 
     gptqQuantizationObject.results_gptq
     # awqQuantizationObject.results
     ])
