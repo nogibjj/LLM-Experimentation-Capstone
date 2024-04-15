@@ -47,3 +47,5 @@ class gptqQuantization(object):
     print('#'*100)
 
     save_model(self.gptq_quantized_model, self.tokenizer, self.model_id, "gptq-quantized")
+    
+    del self.gptq_quantized_model

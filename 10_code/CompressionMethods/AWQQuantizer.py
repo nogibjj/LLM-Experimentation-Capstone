@@ -67,3 +67,5 @@ class AWQQuantization(object):
     print("Results of AWQ Quantization:")
     pprint(self.results_awq)
     print('#'*100)
+
+    del self.awq_quantized_model

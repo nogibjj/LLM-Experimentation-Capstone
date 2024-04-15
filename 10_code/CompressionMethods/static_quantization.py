@@ -60,6 +60,9 @@ class staticQuantization(object):
         save_model(self.model_4_bit, self.tokenizer, self.model_id, "4-bit-static-quantized")
         save_model(self.model_8_bit, self.tokenizer, self.model_id, "8-bit-static-quantized")
 
+        del self.model_4_bit
+        del self.model_8_bit
+
 
         
 
