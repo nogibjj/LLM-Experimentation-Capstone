@@ -3,7 +3,6 @@ from CompressionMethods.utils import load_data_hf, get_model_size, evaluate_heeg
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, AwqConfig 
 from awq import AutoAWQForCausalLM
 from pprint import pprint
-from torch import cuda
 
 class AWQQuantization(object):
   """
@@ -45,7 +44,7 @@ class AWQQuantization(object):
     model_name = model_id.split('/')[-1]
     model_path = f"models/{model_name}/awq-quantized"
 
-    self.awq_quantized_model =  AutoModelForSequenceClassification.from_pretrained(model_path, device_map = "auto", num_labels = num_labels).to(self.device)
+    self.awq_quantized_model =  AutoModelForSequenceClassification.from_pretrained(model_path, device_map = "auto", num_labels = num_labels).to("cuda")
 
   def compress_model(self):
     pass
