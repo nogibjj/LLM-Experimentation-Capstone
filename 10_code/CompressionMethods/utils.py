@@ -196,7 +196,10 @@ def compute_metrics(p: EvalPrediction):
 def save_model(model, tokenizer, model_id, compression_type):
     model_name = model_id.split('/')[-1]
     model_path = f"models/{model_name}/{compression_type}"
-    model.save_pretrained(model_path)
+    if 'awq' in compression_type.lower():
+        model.save_quantized(model_path)
+    else:
+        model.save_pretrained(model_path)
     tokenizer.save_pretrained(model_path)
 '''
 class utils(object):
