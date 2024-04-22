@@ -144,6 +144,13 @@ The code will run all the experiments as mentioned in Section 3.1.2. Please take
 
 The code will store the models of each method and output a csv with the following information 
 
+or run
+```
+python onnx_conversion.py --model_checkpoint "bert-base-uncased" --onnx_path "/path/to/bert_base_uncased.onnx" --sample_input "The quick brown fox jumps over the lazy dog"   --load_method "huggingface"
+
+```
+
+for onnx result
 1. Method Name
 2. Model Size
 3. Average Inference Time
