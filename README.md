@@ -16,7 +16,7 @@
 4. [Results](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#4-results)
 <br>4.1 [BERT Model](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#4-results)
 <br>4.2 [TinyLlama Model](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#42-tinyllama-model)
-<br>4.3 [ONNX](### 4.3 Network Exchange (ONNX))
+<br>4.3 [ONNX](#43-network-exchange-onnx)
 6. [Conclusion](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#5-conclusion)
 7. [Usage Instructions](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#6-usage-instructions)
 8. [Contributors](https://github.com/nogibjj/LLM-Experimentation-Capstone?tab=readme-ov-file#7-contributors)
