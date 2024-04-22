@@ -8,6 +8,7 @@ def main():
     parser.add_argument('--onnx_path', type=str, required=True, help='Path to save the ONNX model.')
     parser.add_argument('--sample_input', type=str, required=True, help='Sample input text for model conversion.')
     parser.add_argument('--device', type=str, default='cpu', choices=['cpu', 'cuda'], help='Device to use for conversion ("cpu" or "cuda").')
+    parser.add_argument('--load_method', type=str, default='huggingface', help='Choose the way you want to load model. Huggingface is reconmmended')
 
     args = parser.parse_args()
 
