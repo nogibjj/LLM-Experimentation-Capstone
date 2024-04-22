@@ -114,6 +114,9 @@ The final stage of our experiment involved bridging the gap between theoretical 
 
 Our findings reveal a notable improvement in computational efficiency, with the average inference speed **~2x** and inference time **halving**. This enhancement in performance did not come at the cost of accuracy or model size, which remained largely unaffected. These results were consistently observed across various hardware configurations, including T4 and V100 GPUs as well as a 16-core Intel CPU. Detailed outcomes pertaining to the T4 GPU are provided below for reference.
 
+<img width="1050" alt="Screenshot 2024-04-21 at 10 40 03 PM" src="https://github.com/nogibjj/LLM-Experimentation-Capstone/assets/55003943/02f78d7a-b3b9-4ca8-ad00-c6988318154f">
+
+
 The model optimization and conversion processes were carried out on a GPU. However, the resulting ONNX models are versatile enough to be deployed on CPUs, ensuring broad applicability.
 
 For those interested in replicating our experiment or delving deeper into our methodology, the complete procedure is documented in [10_code/NetworkExMethods](https://github.com/nogibjj/LLM-Experimentation-Capstone/tree/main/10_code/NetworkExMethods) within our GitHub repository.
