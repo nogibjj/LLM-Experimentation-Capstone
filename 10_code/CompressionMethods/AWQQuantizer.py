@@ -17,7 +17,7 @@ class AWQQuantization(object):
     self.model_type = model_type
     self.results_awq = {}
     self.results_awq['method'] = 'AWQ-quantization'
-    self.device = 'cuda' if cuda.is_available() else 'cpu' 
+    self.device = 'cuda'
 
     assert self.model_type == 'llama', f"AWQ can not be applied to {self.model_type} model."
 
